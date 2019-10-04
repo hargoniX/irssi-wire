@@ -1,12 +1,14 @@
 [package]
-name = "irssi-sys"
+name = "irssi-wire"
 version = "0.1.0"
 authors = ["Henrik Böving <hargonix@gmail.com>"]
 edition = "2018"
 license = "MIT"
-documentation = "https://docs.rs/irssi-sys"
-description = "Automatically generated bindings to irssi"
-repository = "https://github.com/hargoniX/irssi-sys"
+
+[build-dependencies]
+bindgen = "0.50"
+
+[lib]
+crate-type = ["dylib"]
 
 [dependencies]
-
