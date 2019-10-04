@@ -1,9 +1,12 @@
 [package]
 name = "irssi-sys"
 version = "0.1.0"
-authors = ["ubuntu"]
+authors = ["Henrik Böving <hargonix@gmail.com>"]
 edition = "2018"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+license = "MIT"
+documentation = "https://docs.rs/irssi-sys"
+description = "Automatically generated bindings to irssi"
+repository = "https://github.com/hargoniX/irssi-sys"
 
 [dependencies]
+
