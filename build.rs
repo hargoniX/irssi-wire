@@ -1,11 +1,12 @@
-extern crate bindgen;
-
 use std::path::PathBuf;
 use std::env;
 use std::io::prelude::*;
 use std::fs::File;
 
+use protoc_rust::Customize;
+
 fn main() {
+    // C bindings
     let server_rec = "
 typedef struct _WireServerRec {
     int x;
@@ -17,9 +18,9 @@ typedef struct _WireServerRec {
     
 
     // Generate bindings for headers.h
+    eprintln!("Generating C bindings");
     let mut irssi_path = "-I".to_string();
     irssi_path.push_str(env::var("IRSSI_INCLUDE").unwrap().as_str());
-    println!("I AM IRSSI PATH: {}", irssi_path);
     let bindings = bindgen::Builder::default()
         .header("headers.h")
         .clang_arg("-I/usr/include/glib-2.0/")
@@ -32,4 +33,15 @@ typedef struct _WireServerRec {
     bindings
         .write_to_file(out_path.join("bindings.rs"))
         .expect("Couldn't write bindings!");
+
+    eprintln!("Generating protobuf code");
+    // Protobuffer code generation
+    protoc_rust::run(protoc_rust::Args {
+        out_dir: "src/net/protos",
+        input: &["wire-api.proto"],
+        includes: &[],
+        customize: Customize {
+            ..Default::default()
+        },
+    }).expect("Couln't generate code from protobuffers for wire api");
 }
