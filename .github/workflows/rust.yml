@@ -1,0 +1,19 @@
+name: Rust
+
+on: [push]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: Irssi, bindgen and protobuf dependencies
+      run: sudo apt install meson ninja-build libglib2.0-dev libssl-dev perl libncurses5-dev libncursesw5-dev protobuf-compiler llvm-dev libclang-dev clang
+    - name: Build Irssi
+      run: cd irssi && meson Build && ninja -C Build && cd ..
+    - name: Build irssi-wire
+      run: IRSSI_INCLUDE=irssi cargo build --verbose
+    - name: Run tests
+      run: IRSSI_INCLUDE=irssi cargo test --verbose
