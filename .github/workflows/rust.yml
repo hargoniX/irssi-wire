@@ -10,9 +10,9 @@ jobs:
     steps:
     - uses: actions/checkout@v1
     - name: Irssi, bindgen and protobuf dependencies
-      run: sudo apt install meson ninja-build libglib2.0-dev libssl-dev perl libncurses5-dev libncursesw5-dev protobuf-compiler llvm-dev clang
+      run: sudo apt install libglib2.0-dev libssl-dev perl libncurses5-dev libncursesw5-dev protobuf-compiler llvm-dev clang
     - name: Build Irssi
-      run: git clone https://github.com/irssi/irssi && cd irssi && meson Build && ninja -C Build && cd ..
+      run: git clone https://github.com/irssi/irssi && cd irssi && ./autogen.sh && ./configure && make && cd ..
     - name: Build irssi-wire
       run: IRSSI_INCLUDE=irssi cargo build --verbose
     - name: Run tests
