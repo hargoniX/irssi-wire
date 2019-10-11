@@ -14,6 +14,6 @@ jobs:
     - name: Build Irssi
       run: git clone https://github.com/irssi/irssi && cd irssi && ./autogen.sh && ./configure && make && cd ..
     - name: Build irssi-wire
-      run: IRSSI_INCLUDE=irssi cargo build --verbose
+      run: REBUILD_PROTOBUF=1 REBUILD_BINDGEN=1 IRSSI_INCLUDE=irssi cargo build -vv
     - name: Run tests
       run: IRSSI_INCLUDE=irssi cargo test --verbose

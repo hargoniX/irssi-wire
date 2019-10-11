@@ -1,11 +1,8 @@
 use std::os::raw::c_int;
 use std::ffi::CString;
-use std::thread;
-use std::time::Duration;
 
 mod irssi;
 mod net;
-mod storage;
 
 use irssi::bindings::*;
 
@@ -22,14 +19,6 @@ pub extern fn wire_core_init() {
     unsafe {
         module_register_full(CString::new("wire").unwrap().as_ptr(), CString::new("core").unwrap().as_ptr(), CString::new("wire/core").unwrap().as_ptr());
     }
-    thread::spawn(|| {
-        let mut i = 0;
-        loop {
-            thread::sleep(Duration::from_secs(10));
-            println!("{} iteration", i);
-            i += 1;
-        }
-    });
 }
 
 #[no_mangle]

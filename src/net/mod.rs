@@ -1,2 +1,1 @@
-pub(crate) mod protos;
-pub(crate) mod model;
+pub mod protos;
