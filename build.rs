@@ -1,7 +1,7 @@
-use std::path::PathBuf;
 use std::env;
-use std::io::prelude::*;
 use std::fs::File;
+use std::io::prelude::*;
+use std::path::PathBuf;
 
 use protoc_rust::Customize;
 
@@ -14,7 +14,8 @@ typedef struct _WireServerRec {
     int x;
 } WireServerRec;
 
-#define STRUCT_SERVER_REC WireServerRec".to_string();
+#define STRUCT_SERVER_REC WireServerRec"
+            .to_string();
 
         let mut recs = File::create("recs.h").unwrap();
         recs.write_all(server_rec.as_bytes()).unwrap();
@@ -33,8 +34,7 @@ typedef struct _WireServerRec {
         bindings
             .write_to_file("src/irssi/bindgen_output.rs")
             .expect("Couldn't write bindings!");
-    }
-    else {
+    } else {
         eprintln!("Skipping C binding generation");
     }
 
@@ -48,9 +48,9 @@ typedef struct _WireServerRec {
             customize: Customize {
                 ..Default::default()
             },
-        }).expect("Couln't generate code from protobuffers for wire api");
-    }
-    else {
+        })
+        .expect("Couln't generate code from protobuffers for wire api");
+    } else {
         eprintln!("Skipping protobuf generation");
     }
 }

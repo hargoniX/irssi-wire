@@ -1,28 +1,31 @@
-use std::os::raw::c_int;
 use std::ffi::CString;
+use std::os::raw::c_int;
 
 mod irssi;
-mod net;
+pub mod net;
 
 use irssi::bindings::*;
 
 #[no_mangle]
-pub extern fn wire_core_abicheck(version: *mut c_int) {
+pub extern "C" fn wire_core_abicheck(version: *mut c_int) {
     unsafe {
-        *version = 23;
+        *version = 24;
     }
 }
 
 #[no_mangle]
-pub extern fn wire_core_init() {
+pub extern "C" fn wire_core_init() {
     println!("HEY");
     unsafe {
-        module_register_full(CString::new("wire").unwrap().as_ptr(), CString::new("core").unwrap().as_ptr(), CString::new("wire/core").unwrap().as_ptr());
+        module_register_full(
+            CString::new("wire").unwrap().as_ptr(),
+            CString::new("core").unwrap().as_ptr(),
+            CString::new("wire/core").unwrap().as_ptr(),
+        );
     }
 }
 
 #[no_mangle]
-pub extern fn wire_core_deinit() {
+pub extern "C" fn wire_core_deinit() {
     println!("BYE");
 }
-
