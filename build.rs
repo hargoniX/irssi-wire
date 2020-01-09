@@ -43,7 +43,7 @@ typedef struct _WireServerRec {
         eprintln!("Generating protobuf code");
         protoc_rust::run(protoc_rust::Args {
             out_dir: "src/net/protos",
-            input: &["wire-api.proto"],
+            input: &["wire_websocket.proto"],
             includes: &[],
             customize: Customize {
                 ..Default::default()
