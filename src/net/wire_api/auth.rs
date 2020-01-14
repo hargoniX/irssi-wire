@@ -4,10 +4,8 @@ use hyper::{header, Body, Client, Method, Request};
 use hyper_tls::HttpsConnector;
 use serde::{Deserialize, Serialize};
 
+use crate::net::wire_api::wire_client::{WireClient};
 use crate::net::wire_api::error::ApiError;
-
-const USER_AGENT: &str = "irssi";
-const CONTENT_TYPE: &str = "application/json";
 
 #[derive(Debug, Clone)]
 pub struct ConnectionUrls {
@@ -35,8 +33,8 @@ impl Config {
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct LoginInfo {
-    email: String,
-    password: String,
+    pub email: String,
+    pub password: String,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -53,51 +51,39 @@ impl AuthResponse {
     }
 }
 
-pub struct WireClient {
-    login_info: LoginInfo,
-    pub client: Client<HttpsConnector<HttpConnector>>,
-    pub config: Config,
-}
-
+// TODO move auth here
 impl WireClient {
-    pub fn new(email: String, password: String, config: Config) -> WireClient {
-        let https_client = Client::builder().build::<_, hyper::Body>(HttpsConnector::new());
-        WireClient {
-            login_info: LoginInfo { email, password },
-            client: https_client,
-            config: config,
-        }
-    }
-
-    pub async fn authentification(&mut self) -> Result<AuthResponse, ApiError> {
+    pub async fn authentification(&mut self) -> Result<(), ApiError> {
         let endpoint = [
             self.config.fetch().rest_url,
-            "/login?persist=true".to_string(),
-        ]
-        .concat();
-        let json = serde_json::to_string(&self.login_info).unwrap();
+            String::from("/login?persist=true")
+        ].concat();
+
+        let json = serde_json::to_string(&self.login_info)
+            .unwrap();
 
         let auth_request = Request::builder()
             .method(Method::POST)
             .uri(endpoint)
-            .header(header::CONTENT_TYPE, CONTENT_TYPE)
-            .header(header::USER_AGENT, USER_AGENT)
+            .header(header::CONTENT_TYPE, "application/json")
+            .header(header::USER_AGENT, &self.user_agent)
             .body(Body::from(json))
             .unwrap();
 
-        let auth_result = self
-            .client
+        let auth_response = self.client
             .request(auth_request)
             .await
             .map_err(|e| ApiError::HttpError(e))?;
 
-        let auth_body = hyper::body::aggregate(auth_result)
+        let body = hyper::body::aggregate(auth_response)
             .await
             .map_err(|e| ApiError::HttpError(e))?;
 
-        let auth_response = serde_json::from_reader(auth_body.bytes())
+        let parsed_json = serde_json::from_reader(body.bytes())
             .map_err(|e| ApiError::JsonParseError(Box::new(e)))?;
 
-        Ok(auth_response)
+        self.auth_token = Some(parsed_json);
+
+        Ok(())
     }
 }
