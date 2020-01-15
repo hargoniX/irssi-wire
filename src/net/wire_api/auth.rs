@@ -1,11 +1,11 @@
-use hyper::body::Buf;
-use hyper::client::connect::HttpConnector;
-use hyper::{header, Body, Client, Method, Request};
-use hyper_tls::HttpsConnector;
+// Dependencies
+use hyper::{
+    body::Buf,
+    {header, Body, Method, Request},
+};
 use serde::{Deserialize, Serialize};
 
-use crate::net::wire_api::wire_client::{WireClient};
-use crate::net::wire_api::error::ApiError;
+use crate::net::wire_api::{error::ApiError, wire_client::WireClient};
 
 #[derive(Debug, Clone)]
 pub struct ConnectionUrls {
@@ -56,11 +56,11 @@ impl WireClient {
     pub async fn authentification(&mut self) -> Result<(), ApiError> {
         let endpoint = [
             self.config.fetch().rest_url,
-            String::from("/login?persist=true")
-        ].concat();
+            String::from("/login?persist=true"),
+        ]
+        .concat();
 
-        let json = serde_json::to_string(&self.login_info)
-            .unwrap();
+        let json = serde_json::to_string(&self.login_info).unwrap();
 
         let auth_request = Request::builder()
             .method(Method::POST)
@@ -70,7 +70,8 @@ impl WireClient {
             .body(Body::from(json))
             .unwrap();
 
-        let auth_response = self.client
+        let auth_response = self
+            .client
             .request(auth_request)
             .await
             .map_err(|e| ApiError::HttpError(e))?;

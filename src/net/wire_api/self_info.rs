@@ -1,7 +1,7 @@
-use serde::{Serialize, Deserialize};
+// Dependencies
+use serde::{Deserialize, Serialize};
 
-use crate::net::wire_api::wire_client::WireClient;
-use crate::net::wire_api::error::ApiError;
+use crate::net::wire_api::{error::ApiError, wire_client::WireClient};
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct SelfInfo {
@@ -26,32 +26,34 @@ pub struct UserAssets {
 
 impl WireClient {
     pub async fn fetch_self(&mut self) -> Result<(), ApiError> {
-        self.self_info = Some(self
-            .api_get(String::from("/self"))
-            .await
-            .unwrap());
+        self.self_info = Some(self.api_get(String::from("/self")).await.unwrap());
 
         Ok(())
     }
 
     pub async fn fetch_conversations(&mut self) -> Result<(), ApiError> {
-        self.conversations = Some(self
-                                  .api_get(String::from("/conversations?size=500"))
-                                  .await
-                                  .unwrap());
+        self.conversations = Some(
+            self.api_get(String::from("/conversations?size=500"))
+                .await
+                .unwrap(),
+        );
 
         Ok(())
     }
 
-    pub async fn fetch_members(&mut self) -> Result<(), ApiError>{
-        self.members = Some(self
-                            .api_get(String::from(
-                                    [String::from("/teams/"),
-                                    self.self_info.clone().unwrap().team.unwrap(),
-                                    String::from("/members"),].concat()
-                                                 ))
-                            .await
-                            .unwrap());
+    pub async fn fetch_members(&mut self) -> Result<(), ApiError> {
+        self.members = Some(
+            self.api_get(String::from(
+                [
+                    String::from("/teams/"),
+                    self.self_info.clone().unwrap().team.unwrap(),
+                    String::from("/members"),
+                ]
+                .concat(),
+            ))
+            .await
+            .unwrap(),
+        );
 
         Ok(())
     }

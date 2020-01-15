@@ -1,12 +1,6 @@
 use std::env;
 
-use irssi_wire::net::wire_api::{
-    wire_client::WireClient,
-    auth::Config,
-    conversations::Conversations,
-    members::Members,
-    self_info::SelfInfo,
-};
+use irssi_wire::net::wire_api::{auth::Config, wire_client::WireClient};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -16,10 +10,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         Config::Default,
     );
 
-    let auth_response = client
-        .authentification()
-        .await
-        .unwrap();
+    let _auth_response = client.authentification().await.unwrap();
 
     dbg!(client);
 

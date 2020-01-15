@@ -1,6 +1,5 @@
-use serde::{Serialize, Deserialize};
-
-use crate::net::wire_api::{error::ApiError};
+// Dependencies
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Members {

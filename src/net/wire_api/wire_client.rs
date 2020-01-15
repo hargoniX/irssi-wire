@@ -1,15 +1,13 @@
-use hyper::body::Buf;
-use hyper::{
-    client::connect::HttpConnector,
-    {header, Body, Client, Method, Request}};
+// Dependencies
+use hyper::{body::Buf, client::connect::HttpConnector, header, Body, Client, Method, Request};
 use hyper_tls::HttpsConnector;
 
-use crate::net::wire_api::error::ApiError;
-use crate::net::wire_api::auth::{LoginInfo, AuthResponse, Config};
 use crate::net::wire_api::{
-    self_info::SelfInfo,
+    auth::{AuthResponse, Config, LoginInfo},
     conversations::Conversations,
+    error::ApiError,
     members::Members,
+    self_info::SelfInfo,
 };
 
 #[derive(Debug)]
@@ -21,7 +19,7 @@ pub struct WireClient {
     pub config: Config,
     pub self_info: Option<SelfInfo>,
     pub conversations: Option<Conversations>,
-    pub members: Option<Members>
+    pub members: Option<Members>,
 }
 
 impl WireClient {
@@ -42,18 +40,25 @@ impl WireClient {
     pub async fn api_post<T>(
         &mut self,
         endpoint: String,
-        body_content: String) -> Result<T, ApiError> 
-    where T: serde::de::DeserializeOwned {
+        body_content: String,
+    ) -> Result<T, ApiError>
+    where
+        T: serde::de::DeserializeOwned,
+    {
         let api_request = Request::builder()
             .method(Method::POST)
             .uri(endpoint)
             .header(header::CONTENT_TYPE, "application/json")
             .header(header::USER_AGENT, &self.user_agent)
-            .header(header::AUTHORIZATION, self.auth_token.as_ref().unwrap().token_string())
+            .header(
+                header::AUTHORIZATION,
+                self.auth_token.as_ref().unwrap().token_string(),
+            )
             .body(Body::from(body_content))
             .unwrap();
 
-        let api_response = self.client
+        let api_response = self
+            .client
             .request(api_request)
             .await
             .map_err(|e| ApiError::HttpError(e))?;
@@ -68,26 +73,31 @@ impl WireClient {
         Ok(parsed_json)
     }
 
-    pub async fn api_get<T>(
-        &mut self,
-        endpoint: String) -> Result<T, ApiError>
-    where T: serde::de::DeserializeOwned {
+    pub async fn api_get<T>(&mut self, endpoint: String) -> Result<T, ApiError>
+    where
+        T: serde::de::DeserializeOwned,
+    {
         let api_request = Request::builder()
             .method(Method::GET)
             .uri([self.config.fetch().rest_url, endpoint].concat())
             .header(header::CONTENT_TYPE, "application/json")
             .header(header::USER_AGENT, &self.user_agent)
-            .header(header::AUTHORIZATION, self.auth_token.as_ref().unwrap().token_string())
+            .header(
+                header::AUTHORIZATION,
+                self.auth_token.as_ref().unwrap().token_string(),
+            )
             .body(Body::empty())
             .unwrap();
 
-        let api_response = self.client
+        let api_response = self
+            .client
             .request(api_request)
             .await
             .map_err(|e| ApiError::HttpError(e))?;
 
         let body = hyper::body::aggregate(api_response)
-            .await.map_err(|e| ApiError::HttpError(e))?;
+            .await
+            .map_err(|e| ApiError::HttpError(e))?;
 
         let parsed_json = serde_json::from_reader(body.bytes())
             .map_err(|e| ApiError::JsonParseError(Box::new(e)))?;
