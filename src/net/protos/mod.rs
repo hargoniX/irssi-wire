@@ -1,1 +1,1 @@
-pub mod wire_api;
+pub mod wire_websocket;
